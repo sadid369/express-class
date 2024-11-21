@@ -8,7 +8,7 @@ function count (req, res, next) {
     console.log(request);
     next();
 }
-// 
+// updated
 app.use(count);
 app.get('/', async (req, res) => {
     res.send(`Number of requests: ${request}`);
