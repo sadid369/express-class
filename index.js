@@ -1,4 +1,6 @@
 const express = require('express');
+const zod = require('zod');
+const schema = zod.array(zod.number());
 
 const app = express();
 app.use(express.json());
@@ -10,10 +12,15 @@ function count (req, res, next) {
 }
 // updated
 app.use(count);
-app.get('/', async (req, res) => {
-    res.send(`Number of requests: ${request}`);
+app.post('/', (req, res) => {
+    const users = req.body.users;
+    const response = schema.safeParse(users);
+    // const length = response.data.length;
+    // res.send({ length });
+    res.send({ response });
+
 });
-app.get('/health-checkup', async (req, res) => {
+app.get('/health-checkup', (req, res) => {
     const username = req.headers.username;
     const password = req.headers.password;
     const kidneyId = req.query.kidneyId;
@@ -29,6 +36,20 @@ app.get('/health-checkup', async (req, res) => {
 
 
 });
+app.use(function(err, req, res, next) {
+    res.status(500).send('Something broke!' + err);
+});
 app.listen(3000, () => {
     console.log('Server running on port 3000');
 });
+
+const schema2 = zod.object({
+    email: zod.string().email(),
+    password: zod.string().min(8)
+});
+
+function validate (obj) {
+    const response = schema2.safeParse(obj);
+    console.log(response);
+}
+validate({ email: 'email@e.com', password: 'password' });
